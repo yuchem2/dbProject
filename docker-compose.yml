@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  mysql:
+  mysqlDB:
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: 1234
@@ -9,7 +9,7 @@ services:
       - "3306:3306"
     volumes:
       - ./db:/docker-entrypoint-initdb.d
-    container_name: mysql
+    container_name: mysqlDB
 
   django:
     build:
@@ -22,6 +22,6 @@ services:
     hostname: django
     container_name: django
     depends_on:
-      - mysql  # MariaDB 컨테이너가 먼저 실행되도록 의존성을 설정합니다.
+      - mysqlDB  # MariaDB 컨테이너가 먼저 실행되도록 의존성을 설정합니다.
     command: >
       bash -c "python manage.py runserver 0.0.0.0:8000"

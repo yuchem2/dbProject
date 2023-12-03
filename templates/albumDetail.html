@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-3">
+    <div class="box border px-4 rounded">
+         <div class="my-3 " style="height: auto !important;">
+            <h2 class="pb-3 mb-0 font-weight-bold">{{ album.albumName }}</h2>
+            <h4><a class="text-decoration-none " style="color:mediumseagreen;" href="{% url 'artist' artist.id %}">{{ artist.artistName }}</a></h4>
+        </div>
+        <div class="d-flex justify-content-between">
+            <div class="my-1">
+                <p>
+                    <strong>발매일</strong>:
+                    {% for song in album.song_set.all|slice:":1" %}
+                        {{ song.createdAt| date:"Y-m-d" }}
+                    {% endfor %}
+                </p>
+                <p>
+                    <strong>장르</strong>:
+                    {% for cate in album.albumcategory_set.all %}
+                        {{ cate.categoryId.category }}
+                        {% if forloop.last == False %}
+                            ,
+                        {% endif %}
+                    {% endfor %}
+                </p>
+                <p>
+                    <strong>기획사</strong>:
+                    {{ artist.agencyName.agencyName }}
+                </p>
+            </div>
+            <div class="my-1">
+                <p>
+                    <i class="fa-solid fa-star"></i> &nbsp; {{ star }}
+                </p>
+                <p>
+                    리뷰&nbsp;<a style="color: lightseagreen;"> {{ album.albumreview_set.count }} 개 ></a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="song-block my-3">
+    {% for song in song_list %}
+        <div class="music-item p-3 my-3 border rounded">
+            <div class="flex-grow-1 px-2">
+                <span class="badge bg-secondary">Track #{{ forloop.counter }}</span>
+                <h3>{{ song.songName }}</h3>
+            </div>
+            <div class="d-flex justify-content-end my-0 py-0">
+                <div class="px-2"><strong>장르</strong> : {{ song.categoryId.category }}</div>
+                <div class="px-2">
+                    <strong>발매일</strong> : {{ song.createdAt|date:"Y-m-d" }}
+                </div>
+            </div>
+            <div class="p-2 text-break">
+                <h5 class="border-bottom border-dark py-2">가사</h5>
+                <p style="white-space: pre-line;">{{ song.lyrics }}</p>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}

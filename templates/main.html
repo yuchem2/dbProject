@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container mt-3" style="height: auto !important;">
+        <div class="border-bottom border-secondary py-3" style="text-align: center;">
+            <h2>Music Search DB</h2>
+        </div>
+        <!-- Search -->
+        <div class="row my-3">
+            <div class="col-6">
+                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                    <input type="radio" class="btn-check" name="btnradio" id="btnradio1" value="recent" checked>
+                    <label class="btn btn-outline-secondary" for="btnradio1">
+                       <i class="fas fa-list"></i>
+                    </label>
+                    <input type="radio" class="btn-check" name="btnradio" id="btnradio3" value="hot">
+                    <label class="btn btn-outline-secondary" for="btnradio3">
+                        <i class="fa-solid fa-fire"></i>
+                    </label>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="input-group">
+                    <input type="text" id="search_kw" class="form-control" value="{{ kw|default_if_none:'' }}">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Table-->
+        <table class="table">
+            <thead>
+            <tr class="text-center table-dark">
+                <th>앨범 번호</th>
+                <th>앨범 이름</th>
+                <th>장르</th>
+                <th>소속사</th>
+                <th>아티스트</th>
+                <th>발매일</th>
+                <th>리뷰</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if album_list %}
+            {% for album in album_list %}
+                <tr class="text-center">
+                    <td class="align-middle">{{ album.albumId }}</td>
+                    <td>
+                        <a class="text-black text-decoration-none" href="{% url 'album' album.albumId %}">
+                            {{ album.albumName }}
+                        </a>
+                    </td>
+                    <td>
+                        {% for cate in album.albumcategory_set.all %}
+                            {{ cate.categoryId.category }}
+                            {% if forloop.last == False %}
+                                ,
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>{{ album.agencyName.agencyName }}</td>
+                    <td>{{ album.artistName }}</td>
+                    <td>
+                        {% for song in album.song_set.all|slice:":1" %}
+                            {{ song.createdAt|date:"Y-m-d" }}
+                        {% endfor %}
+                    </td>
+                    <td>{{ album.albumreview_set.count }}</td>
+                </tr>
+            {%  endfor %}
+            {%  else %}
+                <tr>
+                    <td colspan="4" style="text-align: center;">앨범이 없습니다.</td>
+                </tr>
+            {%  endif %}
+            </tbody>
+        </table>
+        <!--Paging-->
+        <ul class="pagination justify-content-center">
+            {% if question_list.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" data-page="{{ album_list.previous_page_number }}" href="javascript:void(0)">이전</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" tabindex="-1" aria-disabled="true" href="#">이전</a>
+                </li>
+            {% endif %}
+            {% for page_number in album_list.paginator.page_range %}
+                {% if page_number >= album_list.number|add:-5 and page_number <= album_list.number|add:5 %}
+                {% if page_number == album_list.number %}
+                    <li class="page-item active" aria-current="page">
+                        <a class="page-link" data-page="{{ page_number }}" href="javascript:void(0)">{{ page_number }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" data-page="{{ page_number }}" href="javascript:void(0)">{{ page_number }}</a>
+                    </li>
+                {% endif %}
+                {% endif %}
+            {% endfor %}
+            {% if question_list.has_next %}
+                <li class="page-item">
+                    <a class="page-link" data-page="{{ album_list.next_page_number }}" href="javascript:void(0)">{{ page_number }}다음</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" tabindex="-1" aria-disabled="true" href="javascript:void(0)">다음</a>
+                </li>
+            {% endif %}
+        </ul>
+        <!--form-->
+         <form id="searchForm" method="get" action="{% url 'main' %}">
+            <input type="hidden" id="kw" name="kw" value="{{ kw|default_if_none:'' }}">
+            <input type="hidden" id="page" name="page" value="{{ page }}">
+            <input type="hidden" id="sort" name="sort" value="{{ sort }}">
+        </form>
+    </div>
+{% endblock %}
+{% block script %}
+    <script type="text/javascript">
+        const sort_radio = document.getElementsByName('btnradio');
+        const sel_var = document.getElementById('sort').value;
+        for(var i=0; i<sort_radio.length; i++) {
+            if(sort_radio[i].value == sel_var) {
+                sort_radio[i].checked = true;
+            }
+        }
+
+        Array.from(sort_radio).forEach(function(element) {
+            element.addEventListener('change', function() {
+                if(element.checked) {
+                    document.getElementById('page').value = 1;
+                    document.getElementById('sort').value = element.value;
+                    document.getElementById('searchForm').submit();
+                }
+            });
+        });
+
+        const page_elements = document.getElementsByClassName("page-link");
+        Array.from(page_elements).forEach(function(element) {
+            element.addEventListener('click', function() {
+                document.getElementById('page').value = this.dataset.page;
+                document.getElementById('sort').value = document.getElementById('sort').value;
+                document.getElementById('searchForm').submit();
+            });
+        });
+        const btn_search = document.getElementById("btn_search");
+        btn_search.addEventListener('click', function() {
+            document.getElementById('kw').value = document.getElementById('search_kw').value;
+            document.getElementById('page').value = 1;
+            document.getElementById('sort').value = "recent";
+            document.getElementById('searchForm').submit();
+        });
+    </script>
+{% endblock %}
