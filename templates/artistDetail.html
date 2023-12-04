@@ -1,6 +1,127 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container my-3">
-
+    <!--Table-->
+    <div class="border-bottom border-secondary py-3" style="text-align: center;">
+        <h2>아티스트 정보</h2>
+    </div>
+    <div class="box border px-4 my-2 rounded">
+         <div class="my-3 " style="height: auto !important;">
+            <h2 class="pb-3 mb-0 font-weight-bold">{{ artist.artistName }}</h2>
+        </div>
+        <div class="d-flex justify-content-between pb-2">
+            <div>
+                <strong>데뷔일</strong> {{ artist.debutedAt|date:"Y-m-d" }}
+            </div>
+            <div>
+                <strong>활동유형</strong>
+                {% if artist.isSolo %}
+                    솔로
+                {% else %}
+                    그룹:
+                    {% for member in member_list %}
+                        {{ member.memberName }}
+                        {% if not forloop.last %}
+                            ,
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <div>
+                <strong>기획사</strong>:
+                {{ artist.agencyName.agencyName }}
+            </div>
+        </div>
+    </div>
+    <div class="border-bottom border-secondary py-1 my-2">
+        <h3>전체 앨범</h3>
+    </div>
+    <table class="table">
+        <thead>
+        <tr class="text-center table-dark">
+            <th>앨범 번호</th>
+            <th>앨범 이름</th>
+            <th>장르</th>
+            <th>소속사</th>
+            <th>아티스트</th>
+            <th>발매일</th>
+            <th>리뷰</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% if album_list %}
+        {% for album in album_list %}
+            <tr class="text-center">
+                <td class="align-middle">{{ album.albumId }}</td>
+                <td>
+                    <a class="text-black text-decoration-none" href="{% url 'album' album.albumId %}">
+                        {{ album.albumName }}
+                    </a>
+                </td>
+                <td>
+                    {% for cate in album.albumcategory_set.all %}
+                        {{ cate.categoryId.category }}
+                        {% if forloop.last == False %}
+                            ,
+                        {% endif %}
+                    {% endfor %}
+                </td>
+                <td>{{ album.agencyName.agencyName }}</td>
+                <td>{{ album.artistName }}</td>
+                <td>
+                    {% for song in album.song_set.all|slice:":1" %}
+                        {{ song.createdAt|date:"Y-m-d" }}
+                    {% endfor %}
+                </td>
+                <td>{{ album.albumreview_set.count }}</td>
+            </tr>
+        {%  endfor %}
+        {%  else %}
+            <tr>
+                <td colspan="4" style="text-align: center;">앨범이 없습니다.</td>
+            </tr>
+        {%  endif %}
+        </tbody>
+    </table>
+    <!--Paging-->
+    <ul class="pagination justify-content-center">
+        {% if question_list.has_previous %}
+            <li class="page-item">
+                <a class="page-link" data-page="{{ album_list.previous_page_number }}" href="javascript:void(0)">이전</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" tabindex="-1" aria-disabled="true" href="#">이전</a>
+            </li>
+        {% endif %}
+        {% for page_number in album_list.paginator.page_range %}
+            {% if page_number >= album_list.number|add:-5 and page_number <= album_list.number|add:5 %}
+            {% if page_number == album_list.number %}
+                <li class="page-item active" aria-current="page">
+                    <a class="page-link" data-page="{{ page_number }}" href="javascript:void(0)">{{ page_number }}</a>
+                </li>
+            {% else %}
+                <li class="page-item">
+                    <a class="page-link" data-page="{{ page_number }}" href="javascript:void(0)">{{ page_number }}</a>
+                </li>
+            {% endif %}
+            {% endif %}
+        {% endfor %}
+        {% if question_list.has_next %}
+            <li class="page-item">
+                <a class="page-link" data-page="{{ album_list.next_page_number }}" href="javascript:void(0)">{{ page_number }}다음</a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <a class="page-link" tabindex="-1" aria-disabled="true" href="javascript:void(0)">다음</a>
+            </li>
+        {% endif %}
+    </ul>
+    <!--form-->
+     <form id="searchForm" method="get" action="{% url 'main' %}">
+        <input type="hidden" id="kw" name="kw" value="{{ kw|default_if_none:'' }}">
+        <input type="hidden" id="page" name="page" value="{{ page }}">
+        <input type="hidden" id="sort" name="sort" value="{{ sort }}">
+    </form>
 </div>
 {% endblock %}

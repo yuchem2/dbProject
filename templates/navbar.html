@@ -23,6 +23,11 @@
                         <a class="nav-link text-light" href="{% url 'signup' %}">회원가입</a>
                     {% endif %}
                 </li>
+                <li class="nav-item">
+                    {% if user.username == 'admin' %}
+                        <a class="nav-link text-light" href="{% url 'admin_main' %}">관리자 전용</a>
+                    {% endif %}
+                </li>
             </ul>
         </div>
     </div>

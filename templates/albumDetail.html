@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load filter %}
 {% block content %}
 <div class="container my-3">
     <div class="box border px-4 rounded">
@@ -33,7 +34,7 @@
                     <i class="fa-solid fa-star"></i> &nbsp; {{ star }}
                 </p>
                 <p>
-                    리뷰&nbsp;<a style="color: lightseagreen;"> {{ album.albumreview_set.count }} 개 ></a>
+                    리뷰&nbsp;<a href="{% url 'albumReview' album.albumId %}" style="color: lightseagreen;"> {{ album.albumreview_set.count }} 개</a> >
                 </p>
             </div>
         </div>
@@ -45,6 +46,14 @@
                 <span class="badge bg-secondary">Track #{{ forloop.counter }}</span>
                 <h3>{{ song.songName }}</h3>
             </div>
+            <div class="d-flex justify-content-end my-1">
+                <p class="px-3">
+                    <i class="fa-solid fa-star"></i> &nbsp; {{ stars|index:forloop.counter0 }}
+                </p>
+                <p>
+                    리뷰&nbsp;<a href="{% url 'songReview' song.id %}" style="color: lightseagreen;"> {{ song.songreview_set.count }} 개</a> >
+                </p>
+            </div>
             <div class="d-flex justify-content-end my-0 py-0">
                 <div class="px-2"><strong>장르</strong> : {{ song.categoryId.category }}</div>
                 <div class="px-2">
@@ -55,6 +64,25 @@
                 <h5 class="border-bottom border-dark py-2">가사</h5>
                 <p style="white-space: pre-line;">{{ song.lyrics }}</p>
             </div>
+            <h5>작곡</h5>
+            <div class="d-flex justify-content-start border-top border-secondary my-1 py-2">
+                {% for composer in song.songcomposer_set.all %}
+                    {{ composer.composerId.composerName }}
+                    {% if forloop.last == False %}
+                        ,
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <h5>작사</h5>
+            <div class="d-flex justify-content-start border-top border-secondary my-1 py-2">
+                {% for lyricist in song.songlyricist_set.all %}
+                    {{ lyricist.lyricistId.lyricistName }}
+                    {% if forloop.last == False %}
+                        ,
+                    {% endif %}
+                {% endfor %}
+            </div>
+
         </div>
     {% endfor %}
     </div>

@@ -22,6 +22,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.main, name='main'),
 
+    # admin
+    path('edit/', views.edit, name='admin_main'),
+
     # User
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
@@ -29,6 +32,10 @@ urlpatterns = [
 
     # Album
     path('album/<int:album_id>', views.albumDetail, name='album'),
+    path('album/<int:album_id>/review', views.albumReview, name='albumReview'),
+    path('album/<int:album_id>/review/create/', views.albumReviewCreate, name='albumReview_create'),
+    path('song/<int:song_id>/review', views.songReview, name='songReview'),
+    path('song/<int:song_id>/review/create/', views.songReviewCreate, name='songReview_create'),
 
     # Artist
     path('artist/<int:artist_id>', views.artistDetail, name='artist')

@@ -3,7 +3,7 @@ from django.db import models
 
 # Create your models here.
 class User(models.Model):
-    userId = models.CharField(db_column='userId', primary_key=True, max_length=12)
+    _id = models.CharField(db_column='_id', primary_key=True, max_length=12)
     password = models.CharField(max_length=20)
 
     class Meta:
@@ -20,8 +20,9 @@ class Agency(models.Model):
 
 
 class Artist(models.Model):
+    id = models.IntegerField(auto_created=True)
     agencyName = models.OneToOneField(Agency, models.DO_NOTHING, db_column='agencyName')
-    artistName = models.CharField(db_column='artistName', max_length=30)  # Field name made lowercase.
+    artistName = models.CharField(db_column='artistName', max_length=30, primary_key=True)  # Field name made lowercase.
     isSolo = models.IntegerField(db_column='isSolo', blank=True, null=True)  # Field name made lowercase.
     debutedAt = models.DateTimeField(db_column='debutedAt', blank=True, null=True)  # Field name made lowercase.
 
@@ -32,8 +33,9 @@ class Artist(models.Model):
 
 
 class Member(models.Model):
-    agencyName = models.ForeignKey(Artist, models.DO_NOTHING, db_column='agencyName', related_name='Agency_agencyName')
-    artistName = models.OneToOneField(Artist, models.DO_NOTHING, db_column='artistName')
+    id = models.IntegerField(auto_created=True, primary_key=True)
+    agencyName = models.ForeignKey(Agency, models.DO_NOTHING, db_column='agencyName', related_name='Agency_agencyName')
+    artistName = models.ForeignKey(Artist, models.DO_NOTHING, db_column='artistName')
     memberName = models.CharField(db_column='memberName', max_length=30)  # Field name made lowercase.
 
     class Meta:
@@ -63,6 +65,7 @@ class Category(models.Model):
 
 
 class AlbumCategory(models.Model):
+    id = models.IntegerField(auto_created=True, primary_key=True)
     albumId = models.ForeignKey(Album, models.DO_NOTHING, db_column='albumId')  # Field name made lowercase.
     categoryId = models.ForeignKey('Category', models.DO_NOTHING, db_column='categoryId')  # Field name made lowercase.
 
@@ -91,8 +94,9 @@ class Lyricist(models.Model):
 
 
 class Song(models.Model):
+    id = models.IntegerField(auto_created=True)
     albumId = models.ForeignKey(Album, models.DO_NOTHING, db_column='albumId')  # Field name made lowercase.
-    songName = models.CharField(db_column='songName', max_length=30, unique=True)  # Field name made lowercase.
+    songName = models.CharField(db_column='songName', max_length=30, primary_key=True)  # Field name made lowercase.
     categoryId = models.ForeignKey(Category, models.DO_NOTHING, db_column='categoryId')  # Field name made lowercase.
     lyrics = models.TextField(blank=True, null=True)
     createdAt = models.DateTimeField(db_column='createdAt', blank=True, null=True)  # Field name made lowercase.
@@ -104,8 +108,9 @@ class Song(models.Model):
 
 
 class SongComposer(models.Model):
-    albumId = models.ForeignKey(Song, models.DO_NOTHING, db_column='albumId')
-    songName = models.ForeignKey(Song, models.DO_NOTHING, db_column='songName', to_field='songName', related_name="+")
+    id = models.IntegerField(auto_created=True, primary_key=True)
+    albumId = models.ForeignKey(Album, models.DO_NOTHING, db_column='albumId', related_name="+")
+    songName = models.ForeignKey(Song, models.DO_NOTHING, db_column='songName', to_field='songName')
     composerId = models.ForeignKey(Composer, models.DO_NOTHING, db_column='composerId')  # Field name made lowercase.
 
     class Meta:
@@ -115,8 +120,9 @@ class SongComposer(models.Model):
 
 
 class SongLyricist(models.Model):
-    albumId = models.ForeignKey(Song, models.DO_NOTHING, db_column='albumId')
-    songName = models.ForeignKey(Song, models.DO_NOTHING, db_column='songName', to_field='songName', related_name="+")
+    id = models.IntegerField(auto_created=True, primary_key=True)
+    albumId = models.ForeignKey(Album, models.DO_NOTHING, db_column='albumId', related_name="+")
+    songName = models.ForeignKey(Song, models.DO_NOTHING, db_column='songName', to_field='songName')
     lyricistId = models.ForeignKey(Lyricist, models.DO_NOTHING, db_column='LyricistId')  # Field name made lowercase.
 
     class Meta:
@@ -126,9 +132,10 @@ class SongLyricist(models.Model):
 
 
 class SongReview(models.Model):
+    id = models.IntegerField(auto_created=True, primary_key=True)
     userId = models.ForeignKey('User', models.DO_NOTHING, db_column='userId')  # Field name made lowercase.
-    albumId = models.ForeignKey(Song, models.DO_NOTHING, db_column='albumId', related_name="+")
-    songName = models.ForeignKey(Song, models.DO_NOTHING, db_column='songName', to_field='songName', related_name="+")
+    albumId = models.ForeignKey(Album, models.DO_NOTHING, db_column='albumId', related_name="+")
+    songName = models.ForeignKey(Song, models.DO_NOTHING, db_column='songName')
     star = models.IntegerField(blank=True, null=True)
     content = models.TextField(blank=True, null=True)
 
@@ -139,6 +146,7 @@ class SongReview(models.Model):
 
 
 class AlbumReview(models.Model):
+    id = models.IntegerField(auto_created=True, primary_key=True)
     userId = models.ForeignKey('User', models.DO_NOTHING, db_column='userId')  # Field name made lowercase.
     albumId = models.ForeignKey(Album, models.DO_NOTHING, db_column='albumId')  # Field name made lowercase.
     star = models.IntegerField(blank=True, null=True)

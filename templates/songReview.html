@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% load filter %}
+{% block content %}
+<div class="container my-3">
+    <div class="song-block my-3">
+        <div class="music-item p-3 my-3 border rounded">
+            <div class="flex-grow-1 px-2">
+                <span class="badge bg-secondary">Track #{{ forloop.counter }}</span>
+                <h3>{{ song.songName }}</h3>
+            </div>
+            <div class="d-flex justify-content-end my-1">
+                <p class="px-3">
+                    <i class="fa-solid fa-star"></i> &nbsp; {{ star }}
+                </p>
+                <p>
+                    리뷰&nbsp;<a style="color: lightseagreen;"> {{ song.songreview_set.count }} 개</a> >
+                </p>
+            </div>
+            <div class="d-flex justify-content-end my-0 py-0">
+                <div class="px-2"><strong>장르</strong> : {{ song.categoryId.category }}</div>
+                <div class="px-2">
+                    <strong>발매일</strong> : {{ song.createdAt|date:"Y-m-d" }}
+                </div>
+            </div>
+            <div class="p-2 text-break">
+                <h5 class="border-bottom border-dark py-2">가사</h5>
+                <p style="white-space: pre-line;">{{ song.lyrics }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="review-block my-3">
+        <!--답변 등록-->
+        {% if user.is_authenticated %}
+            <form action="{% url 'songReview_create' song.id %}" method="post" class="my-3">
+            {%  csrf_token %}
+            <!-- 오류표시 -->
+            {% if form %}
+            {% include "form_errors.html" %}
+            {% endif %}
+            <div class="mb-1 my-1">
+                <div class="d-flex justify-content-end">
+                    <label class="align-center py-3 px-2" for="star">
+                        <i class="fa-solid fa-star"></i>
+                    </label>
+                    <div class="py-2">
+                        <select class="form-select" name="star" id="star">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                </div>
+
+                <textarea class="form-control" placeholder="리뷰를 입력하시오..."name="content" id="content" rows="3"></textarea>
+            </div>
+            <input type="submit" value="리뷰등록" class="btn btn-primary">
+            </form>
+        {% endif %}
+        <!--답변-->
+        {% if review_list %}
+        {% for review in review_list %}
+            <div class="answer-item p-3 my-3 border rounded">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <strong>{{ review.userId|id }}</strong> 님
+                    </div>
+                    <div class="px-3">
+                        <i class="fa-solid fa-star"></i> &nbsp; {{ review.star }}
+                    </div>
+                </div>
+                <div class="p-2">{{ review.content }}</div>
+            </div>
+        {% endfor %}
+        <!--답변 페이징 처리 시작-->
+        <ul class="pagination justify-content-center">
+            {% if review_list.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" data-page="{{ review_list.previous_page_number }}" href="javascript:void(0)">이전</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" tabindex="-1" aria-disabled="true" href="#">이전</a>
+                </li>
+            {% endif %}
+            {% for page_number in review_list.paginator.page_range %}
+                {% if page_number >= review_list.number|add:-5 and page_number <= review_list.number|add:5 %}
+                {% if page_number == review_list.number %}
+                    <li class="page-item active" aria-current="page">
+                        <a class="page-link" data-page="{{ page_number }}" href="javascript:void(0)">{{ page_number }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" data-page="{{ page_number }}" href="javascript:void(0)">{{ page_number }}</a>
+                    </li>
+                {% endif %}
+                {% endif %}
+            {% endfor %}
+            {% if review_list.has_next %}
+            <li class="page-item">
+                <a class="page-link" data-page="{{ review_list.next_page_number }}" href="javascript:void(0)">다음</a>
+            </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <a class="page-link" tabindex="-1" aria-disabled="true" href="javascript:void(0)">다음</a>
+                </li>
+            {% endif %}
+        </ul>
+        <!--답변 페이징 처리 끝 -->
+        {% endif %}
+        <form id="searchForm" method="get" action="{% url 'songReview' song.id %}">
+            <input type="hidden" id="page" name="page" value="{{ page }}">
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+    <script type="text/javascript">
+        const page_elements = document.getElementsByClassName("page-link");
+            Array.from(page_elements).forEach(function(element) {
+                element.addEventListener('click', function() {
+                    document.getElementById('page').value = this.dataset.page;
+                    document.getElementById('searchForm').submit();
+                });
+            });
+    </script>
+{% endblock %}
