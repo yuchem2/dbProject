@@ -20,7 +20,8 @@ def main(request):
         album_list = album_list.filter(
             Q(albumName__icontains=kw) |
             Q(albumcategory__categoryId__category__icontains=kw) |
-            Q(agencyName__agencyName__icontains=kw)
+            Q(artistName__icontains=kw) |
+            Q(agencyName__agencyName__contains=kw)
         ).distinct()
     paginator = Paginator(album_list, 10)
     page_obj = paginator.get_page(page)
