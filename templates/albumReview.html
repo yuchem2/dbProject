@@ -76,6 +76,9 @@
                 <div class="d-flex justify-content-between">
                     <div>
                         <strong>{{ review.userId|id }}</strong> 님
+                        {% if request.user.username == review.userId|id %}
+                            <a href="{% url 'albumReview_modify' review.id %}">수정</a>
+                        {% endif %}
                     </div>
                     <div class="px-3">
                         <i class="fa-solid fa-star"></i> &nbsp; {{ review.star }}
@@ -83,7 +86,6 @@
                 </div>
 
                 <div class="p-2">{{ review.content }}</div>
-
             </div>
         {% endfor %}
         <!--답변 페이징 처리 시작-->

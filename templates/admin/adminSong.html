@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-3">
+    <div class="border-bottom border-secondary py-3" style="text-align: center;">
+        <h2>Song Admin Page</h2>
+    </div>
+    <div class="box border px-4 rounded">
+        <div class="my-3 " style="height: auto !important;">
+            <h2 class="pb-3 mb-0 font-weight-bold">
+                <a class="text-black text-decoration-none" href="{% url 'album' album.albumId %}">
+                    {{ album.albumName }}
+                </a>
+            </h2>
+            <h4><a class="text-decoration-none " style="color:mediumseagreen;" href="{% url 'artist' artist.id %}">{{ artist.artistName }}</a></h4>
+        </div>
+        <div class="d-flex justify-content-between">
+            <div class="my-1">
+                <p>
+                    <strong>발매일</strong>:
+                    {% for song in album.song_set.all|slice:":1" %}
+                        {{ song.createdAt| date:"Y-m-d" }}
+                    {% endfor %}
+                </p>
+                <p>
+                    <strong>장르</strong>:
+                    {% for cate in album.albumcategory_set.all %}
+                        {{ cate.categoryId.category }}
+                        {% if forloop.last == False %}
+                            ,
+                        {% endif %}
+                    {% endfor %}
+                </p>
+                <p>
+                    <strong>기획사</strong>:
+                    {{ artist.agencyName.agencyName }}
+                </p>
+            </div>
+            <div class="my-1">
+                <p>
+                    <i class="fa-solid fa-star"></i> &nbsp; {{ star }}
+                </p>
+                <p>
+                    리뷰&nbsp;<a href="{% url 'albumReview' album.albumId %}" style="color: lightseagreen;"> {{ album.albumreview_set.count }} 개</a> >
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="my-2 py-2">
+        <table class="table my-2">
+            <thead>
+            <tr class="text-center table-dark">
+                <th>번호</th>
+                <th>곡이름</th>
+                <th>장르</th>
+                <th>발매일</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for song in song_list %}
+                <tr class="text-center">
+                    <td class="align-middle">
+                        <a type="button" class="btn btn-danger btn-sm" href="{% url 'admin_song_delete' song.id %}">삭제</a>
+                        <span class="badge bg-secondary">Track #{{ forloop.counter }}</span>
+                    </td>
+                    <td>{{ song.songName }}</td>
+                    <td>{{ song.categoryId.category }}</td>
+                    <td>{{ song.createdAt|date:"Y-m-d" }}</td>
+                </tr>
+            {%  endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="border-bottom my-3">
+        <h5>새로운 수록곡 추가</h5>
+    </div>
+    <div class="border rounded p-3 my-3">
+        <form method="POST">
+            {% csrf_token %}
+            {% include "form_errors.html" %}
+            <div class="mb-3">
+                <label for="songName">수록곡 이름</label>
+                <input type="text" class="form-control" id="songName" name="songName" value="{{ form.songName.value|default_if_none:'' }}">
+                <label for="category">장르</label>
+                <select class="form-control form-control-sm mt-3" id="category" name="category">
+                    <option value=""></option>
+                    {% for category in category_list %}
+                        <option value="{{ category.categoryId }}">{{ category.category }}</option>
+                    {% endfor %}
+                </select>
+                <label for="createdAt">데뷔일</label>
+                <input type="datetime-local" class="form-control" id="createdAt" name="createdAt" value="{{ form.debutedAt.value|default_if_none:'' }}">
+
+                <label for="lyrics">가사</label>
+                <textarea class="form-control" id="lyrics" name="lyrics" rows="3" placeholder="가사를 입력하시오">{{ form.lyrics.value|default_if_none:'' }}</textarea>
+                <label for="lyricists">작사가</label>
+                <textarea class="form-control" id="lyricists" name="lyricists" rows="3" placeholder="작사가를 ','를 이용해 나열하시오">{{ form.lyricists.value|default_if_none:'' }}</textarea>
+                <label for="composers">작곡가</label>
+                <textarea class="form-control" id="composers" name="composers" rows="3" placeholder="작곡가를 ','를 이용해 나열하시오">{{ form.composers.value|default_if_none:'' }}</textarea>
+            </div>
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-secondary">등록</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

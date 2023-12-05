@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-3">
+    <div class="border-bottom border-secondary py-3" style="text-align: center;">
+        <h2>Agency Admin Page</h2>
+    </div>
+    <div class="my-2 py-2">
+        <table class="table my-2">
+            <thead>
+            <tr class="text-center table-dark">
+                <th>번호</th>
+                <th style="width: 80%">소속사 이름</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if agency_list %}
+            {% for agency in agency_list %}
+                <tr class="text-center">
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        {{ agency.agencyName }}
+                    </td>
+                </tr>
+            {% endfor %}
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <div class="border-bottom my-3">
+        <h5>새로운 소속사 추가</h5>
+    </div>
+    <div class="border rounded p-3 my-3">
+        <form method="POST">
+            {% csrf_token %}
+            {% include "form_errors.html" %}
+            <div class="mb-3">
+                <label for="agencyName">소속사 이름</label>
+                <input type="text" class="form-control" id="agencyName" name="agencyName" value="{{ form.agencyName.value|default_if_none:'' }}">
+            </div>
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-secondary">등록</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

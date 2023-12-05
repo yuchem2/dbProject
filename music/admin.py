@@ -31,6 +31,7 @@ class AlbumAdmin(admin.ModelAdmin):
 
 class SongAdmin(admin.ModelAdmin):
     list_display = ['songName', 'id']
+    ordering = ['id']
 
 admin.site.register(User)
 admin.site.register(Album, AlbumAdmin)

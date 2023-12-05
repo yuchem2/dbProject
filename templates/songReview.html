@@ -65,6 +65,9 @@
                 <div class="d-flex justify-content-between">
                     <div>
                         <strong>{{ review.userId|id }}</strong> 님
+                        {% if request.user.username == review.userId|id %}
+                            <a href="{% url 'songReview_modify' review.id %}">수정</a>
+                        {% endif %}
                     </div>
                     <div class="px-3">
                         <i class="fa-solid fa-star"></i> &nbsp; {{ review.star }}

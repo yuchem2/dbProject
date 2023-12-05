@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-3">
+    <div class="review-block my-3">
+        <div class="border-bottom border-secondary py-3" style="text-align: center;">
+            <h2>Music Search DB</h2>
+        </div>
+
+        <!--답변 등록-->
+        {% if user.is_authenticated %}
+            <form method="post" class="my-3">
+            {%  csrf_token %}
+            <!-- 오류표시 -->
+            {% if form %}
+            {% include "form_errors.html" %}
+            {% endif %}
+            <div class="mb-1 my-1">
+                <div class="d-flex justify-content-end">
+                    <label class="align-center py-3 px-2" for="star">
+                        <i class="fa-solid fa-star"></i>
+                    </label>
+                    <div class="py-2">
+                        <select class="form-select" name="star" id="star">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                </div>
+                <textarea class="form-control" placeholder="리뷰를 입력하시오..."name="content" id="content" rows="3">{{ form.content.value|default_if_none:'' }}</textarea>
+            </div>
+            <input type="submit" value="리뷰등록" class="btn btn-primary">
+            </form>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

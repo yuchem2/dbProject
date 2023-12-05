@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load filter %}
+{% block content %}
+<div class="container my-3">
+    <div class="border-bottom border-secondary py-3" style="text-align: center;">
+        <h2>Song Review Admin Page</h2>
+    </div>
+    <div class="my-2 py-2">
+        <table class="table my-2">
+            <thead>
+            <tr class="text-center table-dark">
+                <th>번호</th>
+                <th>유저</th>
+                <th>앨범 이름</th>
+                <th>소속사</th>
+                <th>아티스트</th>
+                <th>별점</th>
+                <th>리뷰</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for review in review_list %}
+                <tr class="text-center">
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ review.userId|id }}</td>
+                    <td class="align-middle">{{ review.albumId.albumName }}</td>
+                    <td>{{ review.albumId.agencyName.agencyName }}</td>
+                    <td>{{ review.albumId.artistName }}</td>
+                    <td><i class="fa-solid fa-star"></i>{{ review.star }}</td>
+                    <td style="text-align:right;">
+                        {{ review.content }}
+                        <a type="button" class="btn btn-danger btn-sm" href="{% url 'admin_song_review_delete' review.id %}">삭제</a>
+                    </td>
+                </tr>
+            {%  endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
